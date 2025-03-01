@@ -1,0 +1,135 @@
+C:\CSVParser\CSVParser\bin\Debug\CSVParser.exe.config
+C:\CSVParser\CSVParser\bin\Debug\CSVParser.exe
+C:\CSVParser\CSVParser\bin\Debug\CSVParser.pdb
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\CSVParser\CSVParser\obj\Debug\MainWindow.g.cs
+C:\CSVParser\CSVParser\obj\Debug\App.g.cs
+C:\CSVParser\CSVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\CSVParser\CSVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\CSVParser\CSVParser\obj\Debug\MainWindow.baml
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.g.resources
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.exe
+C:\CSVParser\CSVParser\obj\Debug\CSVParser.pdb
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\bin\Debug\CSVParser.exe.config
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\bin\Debug\CSVParser.exe
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\bin\Debug\CSVParser.pdb
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\MainWindow.g.cs
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\App.g.cs
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\MainWindow.baml
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.g.resources
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.exe
+C:\CSVParserProj\CSVParser_v0.2\CSVParser\obj\Debug\CSVParser.pdb
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\bin\Debug\CSVParser.exe.config
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\bin\Debug\CSVParser.exe
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\bin\Debug\CSVParser.pdb
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\MainWindow.g.cs
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\App.g.cs
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\MainWindow.baml
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.g.resources
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.exe
+C:\CSVParserProj\CSVParser_v0.3\CSVParser\obj\Debug\CSVParser.pdb
+C:\Users\Alexander\source\repos\SCVParser\bin\Debug\CSVParser.exe.config
+C:\Users\Alexander\source\repos\SCVParser\bin\Debug\CSVParser.exe
+C:\Users\Alexander\source\repos\SCVParser\bin\Debug\CSVParser.pdb
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\MainWindow.g.cs
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\App.g.cs
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\MainWindow.baml
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.g.resources
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.exe
+C:\Users\Alexander\source\repos\SCVParser\obj\Debug\CSVParser.pdb
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\bin\Debug\CSVParser.exe.config
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\bin\Debug\CSVParser.exe
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\bin\Debug\CSVParser.pdb
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\MainWindow.g.cs
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\App.g.cs
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\MainWindow.baml
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.g.resources
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.exe
+C:\Users\Alexander\source\repos\SCVParser\SCVParser\obj\Debug\CSVParser.pdb
+C:\Users\poas\Downloads\SCVParser\bin\Debug\CSVParser.exe.config
+C:\Users\poas\Downloads\SCVParser\bin\Debug\CSVParser.exe
+C:\Users\poas\Downloads\SCVParser\bin\Debug\CSVParser.pdb
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Users\poas\Downloads\SCVParser\obj\Debug\MainWindow.g.cs
+C:\Users\poas\Downloads\SCVParser\obj\Debug\App.g.cs
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Users\poas\Downloads\SCVParser\obj\Debug\MainWindow.baml
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.g.resources
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.exe
+C:\Users\poas\Downloads\SCVParser\obj\Debug\CSVParser.pdb
+C:\Projects\SCVParser\bin\Debug\CSVParser.exe.config
+C:\Projects\SCVParser\bin\Debug\CSVParser.exe
+C:\Projects\SCVParser\bin\Debug\CSVParser.pdb
+C:\Projects\SCVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Projects\SCVParser\obj\Debug\MainWindow.g.cs
+C:\Projects\SCVParser\obj\Debug\App.g.cs
+C:\Projects\SCVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Projects\SCVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Projects\SCVParser\obj\Debug\MainWindow.baml
+C:\Projects\SCVParser\obj\Debug\CSVParser.g.resources
+C:\Projects\SCVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Projects\SCVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Projects\SCVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Projects\SCVParser\obj\Debug\CSVParser.exe
+C:\Projects\SCVParser\obj\Debug\CSVParser.pdb
+C:\Projects\SCVParser — копия\bin\Debug\CSVParser.exe.config
+C:\Projects\SCVParser — копия\bin\Debug\CSVParser.exe
+C:\Projects\SCVParser — копия\bin\Debug\CSVParser.pdb
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Projects\SCVParser — копия\obj\Debug\MainWindow.g.cs
+C:\Projects\SCVParser — копия\obj\Debug\App.g.cs
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Projects\SCVParser — копия\obj\Debug\MainWindow.baml
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.g.resources
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.exe
+C:\Projects\SCVParser — копия\obj\Debug\CSVParser.pdb
+C:\Users\poas\source\repos\SCVParser\bin\Debug\CSVParser.exe.config
+C:\Users\poas\source\repos\SCVParser\bin\Debug\CSVParser.exe
+C:\Users\poas\source\repos\SCVParser\bin\Debug\CSVParser.pdb
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.csproj.AssemblyReference.cache
+C:\Users\poas\source\repos\SCVParser\obj\Debug\MainWindow.g.cs
+C:\Users\poas\source\repos\SCVParser\obj\Debug\App.g.cs
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser_MarkupCompile.cache
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser_MarkupCompile.lref
+C:\Users\poas\source\repos\SCVParser\obj\Debug\MainWindow.baml
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.g.resources
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.Properties.Resources.resources
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.csproj.GenerateResource.cache
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.csproj.CoreCompileInputs.cache
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.exe
+C:\Users\poas\source\repos\SCVParser\obj\Debug\CSVParser.pdb
