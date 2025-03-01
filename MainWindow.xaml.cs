@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Linq;
+using MessageBox = System.Windows.MessageBox;
 
 namespace CSVParser
 {
@@ -15,34 +16,35 @@ namespace CSVParser
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        private readonly ErrorHandler _errorHandler;
+        private readonly Checker _checker;
+        private Cleaner _cleaner;
+
         public MainWindow()
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             collectUIDs.IsEnabled = false;
+            _errorHandler = new ErrorHandler(); // Инициализация ErrorHandler
+            _cleaner = new Cleaner(this);
         }
-        //private string selectedFilePath; // Переменная для хранения пути к выбранному файлу
+        
         List<string> pathFilesList = new List<string>() { }; //Создать список путей к файлам
         List<string> uidsList = new List<string>() { }; //Создать список со значениями
         List<string> measurementsList = new List<string>() { }; //Создать список со значениями
         Dictionary<string, string> uids = new Dictionary<string, string>(); //Создать словарь с итоговыми значениями
-        string createdFilePath = "";
-        int counterFiles = 0; //Найдено .csv файлов   //Удалено дубликатов    //Записано в файл
-        int counterRows = 0; //Обработано строк    
+        string createdFilePath;
+
+        int counterFiles; //Найдено .csv файлов   //Удалено дубликатов    //Записано в файл
+        int counterRows; //Обработано строк    
 
         Random rnd = new Random();
 
         public void PathBtn_Click(object sender, RoutedEventArgs e)
         {
-            CleanDictAndList();
-            pathFilesList.Clear();
-            processedFilesLabelValue.Content = 0;
-            processedRowsLabelValue.Content = 0;
-            writeToFileUIDsLabelValue.Content = 0;
-
+            _cleaner.Clean(processedFilesLabelValue, processedRowsLabelValue, writeToFileUIDsLabelValue, pathTextBox, uidsList, measurementsList, pathFilesList, uids);
             counterFiles = 0;
             counterRows = 0;
-            pathTextBox.Text = "";
             pathTextBox.Text = ReceivePath(createdFilePath);  //  Получить путь к файлам и записать в текстбокс Путь
             try
             {
@@ -65,36 +67,28 @@ namespace CSVParser
             // Отображаем диалоговое окно
             openFileDialog.ShowDialog();
 
-            // Проверяем, что пользователь выбрал файл
-
             // Получаем путь к выбранному файлу и сохраняем его в переменной
             pathFileTextBox.Text = openFileDialog.FileName;
 
             // Выводим путь к файлу в текстовое поле (если нужно)
-            pathFileTextBox.Text = pathFileTextBox.Text;
-
-            
+            pathFileTextBox.Text = pathFileTextBox.Text; 
         }
 
         public void CollectUIDs_Click(object sender, RoutedEventArgs e)
         {
-
-            processedRowsLabelValue.Content = 0;
-            writeToFileUIDsLabelValue.Content = 0;
+            _cleaner.Clean(processedRowsLabelValue, writeToFileUIDsLabelValue);
             counterRows = 0;
 
             MakeAll();  //Выболнить действия по сбору UIDов            
             processedRowsLabelValue.Content = counterRows;
         }
 
-        //    Получить путь к папке 
-        //public static string ReceivePath()
-        //{
-        //    FolderBrowserDialog dialog = new FolderBrowserDialog();
-        //    dialog.ShowDialog();
-        //    string folderCSV = dialog.SelectedPath; //выбранный путь в переменную
-        //    return folderCSV;
-        //}
+        private void sortedUIDs_Click(object sender, RoutedEventArgs e)
+        {
+            string path = pathFileTextBox.Text;
+            ViewAllRowsInFileToSorting();
+            CheckBoxMeasurements.IsChecked = true;
+        }
 
         public static string ReceivePath(string initialPath = null)
         {
@@ -112,8 +106,8 @@ namespace CSVParser
 
             // Проверяем, что пользователь выбрал папку
 
-                // Возвращаем выбранный путь
-                return dialog.SelectedPath;
+            // Возвращаем выбранный путь
+            return dialog.SelectedPath;
 
         }
 
@@ -135,8 +129,10 @@ namespace CSVParser
             }
             if (counterFiles == 0)
             {
-                System.Windows.MessageBox.Show("В выбранной папке .csv файлы не найдены");
+                string errorMessage = _errorHandler.GetErrorMessage(6); // "В выбранной папке .csv файлы не найдены"
+                MessageBox.Show(errorMessage); // Показываем сообщение          
                 pathTextBox.Text = "";
+                return;
             }
         }
 
@@ -145,8 +141,7 @@ namespace CSVParser
         {
             if (e.Key == Key.Enter)
             {
-                System.Windows.MessageBox.Show("Не балуйся, я так пока не умею :)");
-                pathTextBox.Text = "";
+                PathBtn_Click(this, new RoutedEventArgs());
             }
         }
 
@@ -192,11 +187,7 @@ namespace CSVParser
 
             string measurementString = GenerateMeasurementString(resultMeasurementList);
 
-            if (uids.ContainsKey(uidsList[index]))
-            {
-                Console.WriteLine("Такой ключ уже есть. Запись отменена");
-            }
-            else
+            if (!uids.ContainsKey(uidsList[index]))
             {
                 uids.Add(uidsList[index], measurementString);
             }
@@ -260,10 +251,15 @@ namespace CSVParser
                 }
                 writeToFileUIDsLabelValue.Content = counterUIDs;
             }
-            System.Windows.MessageBox.Show("Файл TI.dat сохранен, получено " + counterUIDs + " UIDов");
+            MessageBox.Show("Файл TI.dat сохранен, получено " + counterUIDs + " UIDов");
             counterUIDs = 0;
             counterRows = 0;
-            CleanDictAndList();
+            _cleaner.Clean(
+                uidsList: uidsList,
+                measurementsList: measurementsList,
+                pathFilesList: pathFilesList,
+                uids: uids
+            );
 
             // Открыть папку с файлом
             OpenFolderWithFile(Path.GetDirectoryName(Path.GetFullPath(filePath)));
@@ -278,31 +274,14 @@ namespace CSVParser
                 System.Diagnostics.Process.Start("explorer.exe", folderPath);
             }
         }
-
-        public void CleanAll()
-        {
-            //  Обнулить счетчик списка файлов
-            counterFiles = 0;
-            counterRows = 0;
-            processedFilesLabelValue.Content = 0;
-            processedRowsLabelValue.Content = 0;
-            writeToFileUIDsLabelValue.Content = 0;
-            uidsList.Clear(); measurementsList.Clear();
-            uids.Clear();
-        }
-
-        public void CleanDictAndList()
-        {
-            uidsList.Clear(); measurementsList.Clear();
-            uids.Clear();
-        }
+       
 
         //  Посмотреть строчки в файле по очереди
-        public void ViewAllRowsInFile(string s)
+        public void ViewAllRowsInFile(string fileName)
         {
             int columnNum = Convert.ToInt32(numberOfColumnTextBox.Text) - 1;  //  Номер колонки с UIDами переводим в индекс
             int columnNumMeasurements = Convert.ToInt32(numberOfColumnMeasurements.Text) - 1;  //  Номер колонки со значениями переводим в индекс
-            using (var reader = new StreamReader(s))
+            using (var reader = new StreamReader(fileName))
             {
                 while (!reader.EndOfStream)
                 {
@@ -326,7 +305,8 @@ namespace CSVParser
                     }
                     catch
                     {
-                        System.Windows.MessageBox.Show($"В файле {s} выбранном столбце нет данных, либо файл пустой");
+                        string errorMessage = _errorHandler.GetErrorMessage(5, fileName); // Получаем сообщение об ошибке
+                        MessageBox.Show(errorMessage); // Показываем сообщение          
                         break;
                     }
                     finally
@@ -398,7 +378,8 @@ namespace CSVParser
 
             if (textBoxes.Any(string.IsNullOrEmpty))
             {
-                System.Windows.MessageBox.Show("Заполни пустые поля");
+                string errorMessage = _errorHandler.GetErrorMessage(4); // Заполни пустые поля
+                MessageBox.Show(errorMessage); // Показываем сообщение          
                 return true;
             }
             return false;
@@ -408,8 +389,10 @@ namespace CSVParser
         {
             if (Convert.ToInt32(valuesRandomFromTextBox.Text) >= Convert.ToInt32(valuesRandomToTextBox.Text) || Convert.ToInt32(timeRandomFromTextBox.Text) >= Convert.ToInt32(timeRandomToTextBox.Text))
             {
-                System.Windows.MessageBox.Show("Проверь начало и конец диапазонов");
+                string errorMessage = _errorHandler.GetErrorMessage(1); // Получаем сообщение об ошибке
+                MessageBox.Show(errorMessage); // Показываем сообщение                
                 return true;
+                
             }
             return false;
         }
@@ -418,7 +401,7 @@ namespace CSVParser
         {
             if (Convert.ToInt32(timeRandomFromTextBox.Text) <= 0 || Convert.ToInt32(timeRandomToTextBox.Text) <= 0)
             {
-                System.Windows.MessageBox.Show("Время не может быть меньше 1");
+                string errorMessage = _errorHandler.GetErrorMessage(2);
                 return true;
             }
             return false;
@@ -429,55 +412,24 @@ namespace CSVParser
         {
             if (string.IsNullOrWhiteSpace(pathTextBox.Text))
             {
-                System.Windows.MessageBox.Show("Заполни путь к файлам");
+                string errorMessage = _errorHandler.GetErrorMessage(3); //Заполни пусть к файлам
+                MessageBox.Show(errorMessage); // Показываем сообщение 
                 return false;
             }
             return true;
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            //collectedUIDsLabel_Copy2.Visibility = Visibility.Visible;
-        }
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            //collectedUIDsLabel_Copy2.Visibility = Visibility.Collapsed;
-        }
+        
 
-        private void numberOfColumnTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
-        private void pathFileTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
-        private void numberOfColumnTextBox_TextChanged_1(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
-        private void pathTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
-        private void sortedUIDs_Click(object sender, RoutedEventArgs e)
-        {
-            string path = pathFileTextBox.Text;
-            ViewAllRowsInFileToSorting();
-            CheckBoxMeasurements.IsChecked = true;
-        }
+        
 
         public void ViewAllRowsInFileToSorting()
         {
             string path = pathFileTextBox.Text; // Путь к файлу
 
-            string dateTimeString = DateTime.Now.ToString("yyyyMMdd_HHmmss"); // Получаем текущую дату и время в формате "yyyyMMdd_HHmmss"
+            string dateTimeString = DateTime.Now.ToString("ddMMyyyy_HHmmss"); // Получаем текущую дату и время в формате "yyyyMMdd_HHmmss"
                                                                               // Имя папки
-            string folderName = $"CSVParser_{dateTimeString}";
+            string folderName = $"{dateTimeString}_CSVParser_Results";
 
             // Путь к папке (например, на рабочем столе)
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -487,7 +439,7 @@ namespace CSVParser
             Directory.CreateDirectory(folderPath);
 
             // Имя файла
-            string fileName = "Result.csv"; // Файл для записи результатов
+            string fileName = $"Result.csv"; // Файл для записи результатов
             string fullPath = Path.Combine(folderPath, fileName); // Полный путь к файлу
 
             int counterRows = 0; // Счетчик строк для отображения
@@ -558,7 +510,36 @@ namespace CSVParser
             // Сохраняем путь к созданному файлу в переменную
             createdFilePath = fullPath;
             //processedRowsLabelValue.Content = counterRows; // Отображаем количество обработанных строк
-            System.Windows.MessageBox.Show($"Файл успешно создан: {fullPath}", "Готово", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Файл успешно создан: {fullPath}", "Готово", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void numberOfColumnTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void pathFileTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void numberOfColumnTextBox_TextChanged_1(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void pathTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
         }
     }
 }
