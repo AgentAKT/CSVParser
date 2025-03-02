@@ -19,14 +19,16 @@ namespace CSVParser
         private readonly ErrorHandler _errorHandler;
         private readonly Checker _checker;
         private Cleaner _cleaner;
+        private StringProcessing _stringProcessing;
 
         public MainWindow()
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            collectUIDs.IsEnabled = false;
+            //collectUIDs.IsEnabled = false;
             _errorHandler = new ErrorHandler(); // Инициализация ErrorHandler
             _cleaner = new Cleaner(this);
+
         }
         
         List<string> pathFilesList = new List<string>() { }; //Создать список путей к файлам
@@ -40,20 +42,7 @@ namespace CSVParser
 
         Random rnd = new Random();
 
-        public void PathBtn_Click(object sender, RoutedEventArgs e)
-        {
-            _cleaner.Clean(processedFilesLabelValue, processedRowsLabelValue, writeToFileUIDsLabelValue, pathTextBox, uidsList, measurementsList, pathFilesList, uids);
-            counterFiles = 0;
-            counterRows = 0;
-            pathTextBox.Text = ReceivePath(createdFilePath);  //  Получить путь к файлам и записать в текстбокс Путь
-            try
-            {
-                var ListOfFiles = ReceiveListOfFiles(pathTextBox.Text);  //  Получить список файлов и записать список файлов в переменную
-                WriteListOfFiles(ListOfFiles); //  Заполнить список файлов
-                collectUIDs.IsEnabled = true;
-            }
-            catch { }
-        }
+        [STAThread] // Требуется для использования OpenFileDialog
 
         public void PathToFileBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -70,9 +59,39 @@ namespace CSVParser
             // Получаем путь к выбранному файлу и сохраняем его в переменной
             pathFileTextBox.Text = openFileDialog.FileName;
 
-            // Выводим путь к файлу в текстовое поле (если нужно)
-            pathFileTextBox.Text = pathFileTextBox.Text; 
         }
+
+        
+
+        public void PathBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Очистка полей и списков перед запуском
+            _cleaner.Clean(
+                processedFilesLabelValue,
+                processedRowsLabelValue,
+                writeToFileUIDsLabelValue,
+                uidsList,
+                measurementsList,
+                pathFilesList,
+                uids);
+
+            // Сброс счетчиков
+            counterFiles = 0;
+            counterRows = 0;
+
+            // Получение выбранных файлов
+            List<string> selectedFiles = ReceivePath(Path.GetDirectoryName(Path.GetFullPath(createdFilePath)));
+
+            // Создание экземпляра StringProcessing (если он еще не создан)
+            if (_stringProcessing == null)
+            {
+                _stringProcessing = new StringProcessing(processedFilesLabelValue, pathFilesList);
+            }
+
+            // Обработка файлов через StringProcessing
+            _stringProcessing.ProcessFiles(selectedFiles);
+        }
+
 
         public void CollectUIDs_Click(object sender, RoutedEventArgs e)
         {
@@ -90,24 +109,28 @@ namespace CSVParser
             CheckBoxMeasurements.IsChecked = true;
         }
 
-        public static string ReceivePath(string initialPath = null)
+        public static List<string> ReceivePath(string initialPath = null)
         {
-            // Создаем экземпляр FolderBrowserDialog
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            // Создаем экземпляр OpenFileDialog
+            OpenFileDialog dialog = new OpenFileDialog();
+
+            // Настройка диалога
+            dialog.Multiselect = true; // Разрешаем выбор нескольких файлов
+            dialog.Title = "Выберите файлы"; // Заголовок диалогового окна
+            dialog.Filter = "CSV files (*.csv)|*.csv"; // Фильтр файлов 
 
             // Если начальный путь передан, устанавливаем его
             if (!string.IsNullOrEmpty(initialPath))
             {
-                dialog.SelectedPath = initialPath;
+                dialog.InitialDirectory = initialPath;
             }
 
             // Отображаем диалоговое окно
             DialogResult result = dialog.ShowDialog();
 
-            // Проверяем, что пользователь выбрал папку
-
-            // Возвращаем выбранный путь
-            return dialog.SelectedPath;
+            // Если пользователь нажал "ОК", возвращаем выбранные файлы
+                // Преобразуем массив FileNames в список и возвращаем
+            return new List<string>(dialog.FileNames);
 
         }
 
@@ -131,7 +154,6 @@ namespace CSVParser
             {
                 string errorMessage = _errorHandler.GetErrorMessage(6); // "В выбранной папке .csv файлы не найдены"
                 MessageBox.Show(errorMessage); // Показываем сообщение          
-                pathTextBox.Text = "";
                 return;
             }
         }
@@ -317,6 +339,7 @@ namespace CSVParser
             }
             processedRowsLabelValue.Content = counterRows;
         }
+
         // если валидный UID, записать его и значение в словари
         public void AddInUidAndMeasurementList(string uidVar, string valueVar)
         {
@@ -325,15 +348,6 @@ namespace CSVParser
                 uidsList.Add(uidVar);
                 measurementsList.Add(valueVar);
             }
-        }
-
-
-        public void ClearAllCounters()
-        {
-            counterRows = 0;
-            processedRowsLabelValue.Content = 0;
-            writeToFileUIDsLabelValue.Content = 0;
-
         }
 
         //    Проверка UIDа
@@ -410,18 +424,9 @@ namespace CSVParser
         //  проверка что путь к файлам не пустой
         private bool CheckPath()
         {
-            if (string.IsNullOrWhiteSpace(pathTextBox.Text))
-            {
-                string errorMessage = _errorHandler.GetErrorMessage(3); //Заполни пусть к файлам
-                MessageBox.Show(errorMessage); // Показываем сообщение 
-                return false;
-            }
+
             return true;
         }
-
-        
-
-        
 
         public void ViewAllRowsInFileToSorting()
         {
@@ -429,7 +434,7 @@ namespace CSVParser
 
             string dateTimeString = DateTime.Now.ToString("ddMMyyyy_HHmmss"); // Получаем текущую дату и время в формате "yyyyMMdd_HHmmss"
                                                                               // Имя папки
-            string folderName = $"{dateTimeString}_CSVParser_Results";
+            string folderName = $"CSVParser_Results_{dateTimeString}";
 
             // Путь к папке (например, на рабочем столе)
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

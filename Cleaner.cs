@@ -16,7 +16,6 @@ namespace CSVParser
             Label processedFilesLabelValue = null,
             Label processedRowsLabelValue = null,
             Label writeToFileUIDsLabelValue = null,
-            TextBox pathTextBox = null,
             List<string> uidsList = null,
             List<string> measurementsList = null,
             List<string> pathFilesList = null,
@@ -29,8 +28,6 @@ namespace CSVParser
                 processedRowsLabelValue.Content = "0";
             if (writeToFileUIDsLabelValue != null)
                 writeToFileUIDsLabelValue.Content = "0";
-            if (pathTextBox != null)
-                pathTextBox.Text = "";
 
             // Очистка списков и словарей
             if (uidsList != null)

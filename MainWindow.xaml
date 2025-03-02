@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSVParser"
         mc:Ignorable="d"
-        Title="CSV Parser" Height="464" Width="594" Icon="/coffeecup.png" ResizeMode="CanResize">
+        Title="CSV Parser" Height="425" Width="594" Icon="/coffeecup.png" ResizeMode="CanResize">
 
     <Window.Resources>
         <!-- Стиль для кнопок -->
@@ -132,12 +132,8 @@
         <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Выбрать импортированный из Навигатора данных csv файл" FontSize="12" Margin="5,0,0,0"/>
 
         <!-- Лейбл "Файл" -->
-        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Margin="10,0,0,0">
-            <Label x:Name="pathLabel1" Content="Файл:" Margin="10,5,5,35" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="10,0,0,0">
             <Button x:Name="pathToFileBtn" Content="Файл" FontSize="11" Style="{StaticResource StyledButton}" Click="PathToFileBtn_Click" Margin="10,5,5,35" Height="25" Width="64" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" />
-        </StackPanel>
-
-        <StackPanel Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="5,5,5,5">
             <TextBox x:Name="pathFileTextBox" Style="{StaticResource StyledTextBox}" TextWrapping="Wrap" Margin="5,5,5,35" TextChanged="pathFileTextBox_TextChanged" Height="20" Width="328"/>
         </StackPanel>
 
@@ -145,17 +141,14 @@
         <Button x:Name="sortedUIDs" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" FontSize="11" Content="Сортировать UIDы" Style="{StaticResource StyledButton}"  Margin="5,40,5,5" Height="25" Width="110" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" Click="sortedUIDs_Click" />
 
         <!-- Лейбл "Путь к папке с csv файлами" -->
-        <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Путь к папке с csv файлами" Margin="10,0,0,0" FontSize="12"/>
+        <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Выбрать .csv файлы для добавления в итоговый файл" Margin="10,0,0,0" FontSize="12"/>
 
         <!-- Лейбл "Путь" -->
         <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal" Margin="10,5,5,5">
-            <Label x:Name="pathLabel" Content="Путь:" Margin="8,5,5,35" VerticalAlignment="Center"/>
-            <Button x:Name="pathBtn" Content="Папка" FontSize="11" Style="{StaticResource StyledButton}" Click="PathBtn_Click" Margin="8,5,5,35" Height="25" Width="64" HorizontalAlignment="Left" />
+            <Button x:Name="pathBtn" Content="Файл" FontSize="11" Style="{StaticResource StyledButton}" Click="PathBtn_Click" Margin="8,5,5,5" Height="25" Width="64" HorizontalAlignment="Left" />
         </StackPanel>
 
-        <StackPanel Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="5,5,5,10">
-            <TextBox x:Name="pathTextBox" Style="{StaticResource StyledTextBox}" TextWrapping="Wrap" Margin="5,5,5,35" KeyDown="PathTextBox_KeyDown" TextChanged="pathTextBox_TextChanged" Height="20" Width="328"/>
-        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="5,5,5,10"/>
 
         <!-- Остальные элементы -->
         <CheckBox x:Name="CheckBoxMeasurements" Grid.Column="0" Grid.Row="4" Content="В файле есть замеры" Checked="CheckBox_Unchecked" Margin="10,5,5,5" Unchecked="CheckBox_Checked" FontSize="10" VerticalAlignment="Bottom" />
@@ -184,7 +177,7 @@
             <TextBox x:Name="timeRandomToTextBox" Style="{StaticResource StyledTextBox}" Width="77" Margin="5,5,5,5" HorizontalAlignment="Left" Text="60" />
         </StackPanel>
 
-        <Label x:Name="processedFilesLabel" Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="5" Content="Найдено .csv файлов:" Margin="10,5,5,5" FontSize="10"/>
+        <Label x:Name="processedFilesLabel" Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="5" Content="Выбрано .csv файлов:" Margin="10,5,5,5" FontSize="10"/>
         <Label x:Name="processedFilesLabelValue" Grid.Column="3" Grid.Row="5" Content="0" Width="77" Margin="5,5,5,5" FontSize="10" HorizontalAlignment="Left"/>
 
         <Label x:Name="processedRowsLabel" Grid.Column="2" Grid.Row="6" Content="Обработано строк:" Margin="10,5,5,5" FontSize="10"/>
@@ -193,7 +186,7 @@
         <Label x:Name="collectedUIDsLabel_Copy1" Grid.Column="2" Grid.Row="7" Content="Записано в файл:" Margin="10,5,5,5" FontSize="10"/>
         <Label x:Name="writeToFileUIDsLabelValue" Grid.Column="3" Grid.Row="7" Content="0" FontSize="10" Width="77" Margin="5,5,5,5" HorizontalAlignment="Left"/>
 
-        <Button x:Name="collectUIDs" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3" FontSize="11" Content="Обработать UIDы" Style="{StaticResource StyledButton}" Click="CollectUIDs_Click" Margin="5,40,5,5" Height="25" Width="110" HorizontalAlignment="Left" />
+        <Button x:Name="collectUIDs" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3" FontSize="11" Content="Обработать UIDы" Style="{StaticResource StyledButton}" Click="CollectUIDs_Click" Margin="5,5,5,5" Height="25" Width="110" HorizontalAlignment="Left" />
 
         <Label Content="© Team78 (UAT)" Grid.Column="0" Grid.Row="12" HorizontalAlignment="Left" IsEnabled="False" Margin="15,5,5,5"/>
     </Grid>
