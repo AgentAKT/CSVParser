@@ -7,14 +7,14 @@ using System.Windows.Controls;
 
 namespace CSVParser
 {
-    internal class StringProcessing
+    internal class WorkingWithFiles
     {
         private Label _processedFilesLabelValue;
         private List<string> _pathFilesList;
         private int _counterFiles;
 
         // Единственный конструктор
-        public StringProcessing(Label processedFilesLabelValue, List<string> pathFilesList)
+        public WorkingWithFiles(Label processedFilesLabelValue, List<string> pathFilesList)
         {
             _processedFilesLabelValue = processedFilesLabelValue;
             _pathFilesList = pathFilesList;

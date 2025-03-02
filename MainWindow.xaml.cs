@@ -19,7 +19,7 @@ namespace CSVParser
         private readonly ErrorHandler _errorHandler;
         private readonly Checker _checker;
         private Cleaner _cleaner;
-        private StringProcessing _stringProcessing;
+        private WorkingWithFiles _workingWithFiles;
 
         public MainWindow()
         {
@@ -58,10 +58,14 @@ namespace CSVParser
 
             // Получаем путь к выбранному файлу и сохраняем его в переменной
             pathFileTextBox.Text = openFileDialog.FileName;
-
         }
 
-        
+        private void sortedUIDs_Click(object sender, RoutedEventArgs e)
+        {
+            string path = pathFileTextBox.Text;
+            ViewAllRowsInFileToSorting();
+            CheckBoxMeasurements.IsChecked = true;
+        }
 
         public void PathBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -80,16 +84,29 @@ namespace CSVParser
             counterRows = 0;
 
             // Получение выбранных файлов
-            List<string> selectedFiles = ReceivePath(Path.GetDirectoryName(Path.GetFullPath(createdFilePath)));
+
+            List<string> selectedFiles;
+
+            if (createdFilePath == null)
+            {
+                // Если createdFilePath равен null, открываем рабочий стол
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                selectedFiles = ReceivePath(desktopPath);
+            }
+            else
+            {
+                // Иначе используем путь из createdFilePath
+                selectedFiles = ReceivePath(Path.GetDirectoryName(Path.GetFullPath(createdFilePath)));
+            }
 
             // Создание экземпляра StringProcessing (если он еще не создан)
-            if (_stringProcessing == null)
+            if (_workingWithFiles == null)
             {
-                _stringProcessing = new StringProcessing(processedFilesLabelValue, pathFilesList);
+                _workingWithFiles = new WorkingWithFiles(processedFilesLabelValue, pathFilesList);
             }
 
             // Обработка файлов через StringProcessing
-            _stringProcessing.ProcessFiles(selectedFiles);
+            _workingWithFiles.ProcessFiles(selectedFiles);
         }
 
 
@@ -97,17 +114,22 @@ namespace CSVParser
         {
             _cleaner.Clean(processedRowsLabelValue, writeToFileUIDsLabelValue);
             counterRows = 0;
+            if (CheckPath() || CheckMeasurements() || CheckTimes() || CheckPeriods())
+            {
+                // Обработать файлы и получить словарь uids
+                Dictionary<string, string> uids = ViewFilesInFolder();
 
-            MakeAll();  //Выболнить действия по сбору UIDов            
+                // Построить файл с использованием словаря uids
+                string filePath = BuildFile(uids);
+
+                // Открыть папку с файлом
+                OpenFolderWithFile(Path.GetDirectoryName(Path.GetFullPath(filePath)));
+            }
+
+            
             processedRowsLabelValue.Content = counterRows;
         }
 
-        private void sortedUIDs_Click(object sender, RoutedEventArgs e)
-        {
-            string path = pathFileTextBox.Text;
-            ViewAllRowsInFileToSorting();
-            CheckBoxMeasurements.IsChecked = true;
-        }
 
         public static List<string> ReceivePath(string initialPath = null)
         {
@@ -167,44 +189,57 @@ namespace CSVParser
             }
         }
 
-        public void MakeAll()
-        {
-
-            if (CheckPath() | CheckMeasurements() | CheckTimes() | CheckPeriods())
-            {
-                ViewFilesInFolder();
-            }
-        }
-
         //  Открыть файлы в папке по очереди
-        public void ViewFilesInFolder()
+        public Dictionary<string, string> ViewFilesInFolder()
         {
+            // Открыть файлы в папке по очереди
             foreach (string filePath in pathFilesList)
             {
                 ViewAllRowsInFile(filePath);
             }
 
-            Dictionary<string, string> uids = new Dictionary<string, string>();
-
+            // Создать и заполнить словарь uids
+            //Dictionary<string, string> uids = new Dictionary<string, string>();
             for (int index = 0; index < uidsList.Count; index++)
             {
                 ProcessUid(index, uids);
             }
-            BuildFile(uids);
+
+            // Вернуть словарь uids
+            return uids;
         }
 
         private void ProcessUid(int index, Dictionary<string, string> uids)
         {
             List<string> resultMeasurementList = new List<string>();
-            bool isDuplicate = false;
+            //bool isDuplicate = false;
+            int countUids = 0;
+            double lastMeasurement = 0;
 
             // Обрабатываем "поток" с одинаковыми UID
             while (index < uidsList.Count - 1 && uidsList[index] == uidsList[index + 1])
             {
                 resultMeasurementList.Add(measurementsList[index]);
+                lastMeasurement = Convert.ToDouble(measurementsList[index + 1]);
                 index++;
-                isDuplicate = true;
+                countUids++;
+                //isDuplicate = true;
             }
+
+            if (countUids < Convert.ToInt16(numberOfValuesTextBox.Text))
+            {
+                int requiredCount = Convert.ToInt16(numberOfValuesTextBox.Text);
+                double lastValue = Convert.ToDouble(measurementsList[index]);
+                Random random = new Random();
+
+                while (countUids < requiredCount - 1)
+                {
+                    double randomValue = lastValue * (1 + (random.NextDouble() * 0.04 - 0.02)); // ±5%
+                    resultMeasurementList.Add(Math.Round(randomValue, 2).ToString());
+                    countUids++;
+                }
+            }
+
             resultMeasurementList.Add(measurementsList[index]); // Добавляем последний UID
 
             string measurementString = GenerateMeasurementString(resultMeasurementList);
@@ -213,32 +248,38 @@ namespace CSVParser
             {
                 uids.Add(uidsList[index], measurementString);
             }
+
+           
+
         }
 
         private string GenerateMeasurementString(List<string> measurements)
         {
+            int requiredCount = Convert.ToInt32(numberOfValuesTextBox.Text);
+            bool isSmartNTFile = CheckBoxSmartNTFile.IsChecked == true;
+            
+            // Модификация существующих измерений
             for (int i = 0; i < measurements.Count; i++)
             {
                 int timeRnd = RandomTime(rnd);
-                if (CheckBoxSmartNTFile.IsChecked == true)
+                if (isSmartNTFile && i == 0) // Добавляем суффикс только к первому элементу
                 {
                     measurements[i] = $"{measurements[i]}[Q:0x70000002]";
                 }
-                else
+                else if (!isSmartNTFile) // Стандартный формат для всех элементов, если SmartNTFile не выбран
                 {
                     measurements[i] = $"{measurements[i]}*{timeRnd}*70000002";
                 }
             }
 
-            // Добавление дополнительных замеров, если их недостаточно
-            int requiredCount = Convert.ToInt32(numberOfValuesTextBox.Text);
+            // Добавление дополнительных измерений, если их недостаточно
             while (measurements.Count < requiredCount)
             {
                 string valueVar = Convert.ToString(RandomValue(rnd));
                 int timeRnd = RandomTime(rnd);
-                if (CheckBoxSmartNTFile.IsChecked == true)
+                if (isSmartNTFile)
                 {
-                    measurements.Add($"{valueVar}");
+                    measurements.Add(valueVar); // Просто добавляем значение без суффикса
                 }
                 else
                 {
@@ -246,36 +287,31 @@ namespace CSVParser
                 }
             }
 
+            // Объединение всех значений через точку с запятой
             return string.Join(";", measurements).Replace(" ", "");
         }
 
-
-        private void BuildFile(Dictionary<string, string> uids)
+        private string BuildFile(Dictionary<string, string> uids)
         {
-            int counterUIDs = 0;
-
-            string filePath = "TI.dat"; // Путь к файлу
+            string filePath = "TI.dat";
+            bool isSmartNTFile = CheckBoxSmartNTFile.IsChecked == true;
 
             using (var writer = new StreamWriter(filePath))
             {
                 foreach (var kvp in uids)
                 {
-                    if (CheckBoxSmartNTFile.IsChecked == true)
-                    {
-                        int timeRnd = RandomTime(rnd);
-                        writer.WriteLine($"UID:{kvp.Key}[F:600,T:{timeRnd}]={kvp.Value};");
-                    }
-                    else
-                    {
-                        writer.WriteLine($"{kvp.Key}={kvp.Value};!");
-                    }
-                    counterUIDs++;
+                    string line = isSmartNTFile
+                        ? $"UID:{kvp.Key}[F:600,T:{RandomTime(rnd)}]={kvp.Value};"
+                        : $"{kvp.Key}={kvp.Value};!";
+                    writer.WriteLine(line);
                 }
-                writeToFileUIDsLabelValue.Content = counterUIDs;
             }
-            MessageBox.Show("Файл TI.dat сохранен, получено " + counterUIDs + " UIDов");
-            counterUIDs = 0;
-            counterRows = 0;
+
+            int counterUIDs = uids.Count;
+            writeToFileUIDsLabelValue.Content = counterUIDs;
+            MessageBox.Show($"Файл TI.dat сохранен, получено {counterUIDs} UIDов");
+
+            // Очистка данных
             _cleaner.Clean(
                 uidsList: uidsList,
                 measurementsList: measurementsList,
@@ -283,8 +319,8 @@ namespace CSVParser
                 uids: uids
             );
 
-            // Открыть папку с файлом
-            OpenFolderWithFile(Path.GetDirectoryName(Path.GetFullPath(filePath)));
+            // Возвращаем путь к файлу
+            return filePath;
         }
 
         // Метод для открытия папки
@@ -309,19 +345,14 @@ namespace CSVParser
                 {
                     string line = reader.ReadLine();  //   Прочитать текущую линию
                     string[] values = line.Split(';');  //   Разделить строку на массив значений                   
-                    string uidVar = values[columnNum];
+                    string uidVar = values[columnNum]; // Получить UID
+                    // Если в файле есть измерения
+                    bool isCheckBoxMesasurement = CheckBoxMeasurements.IsChecked == true;
                     try
                     {
-                        string valueVar;
-
-                        if (CheckBoxMeasurements.IsChecked == true)
-                        {
-                            valueVar = values[columnNumMeasurements];
-                        }
-                        else
-                        {
-                            valueVar = Convert.ToString(RandomValue(rnd));
-                        }
+                        string valueVar = isCheckBoxMesasurement 
+                            ? values[columnNumMeasurements]
+                            : Convert.ToString(RandomValue(rnd));
 
                         AddInUidAndMeasurementList(uidVar, valueVar);
                     }
@@ -473,9 +504,12 @@ namespace CSVParser
                                 double value = 0.0;
 
                                 // Определяем, какое значение записывать на основе текста
-                                // Напряжение
+
+                                // Частота
                                 if (text.Contains("Частота"))
                                     value = random.NextDouble() * 0.01 + 49.9; // 6кВ +- 5%
+
+                                // Напряжение
                                 else if (text.Contains(" 6кВ U"))
                                     value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
                                 else if (text.Contains(" 10кВ U"))

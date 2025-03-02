@@ -133,12 +133,12 @@
 
         <!-- Лейбл "Файл" -->
         <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="10,0,0,0">
-            <Button x:Name="pathToFileBtn" Content="Файл" FontSize="11" Style="{StaticResource StyledButton}" Click="PathToFileBtn_Click" Margin="10,5,5,35" Height="25" Width="64" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" />
-            <TextBox x:Name="pathFileTextBox" Style="{StaticResource StyledTextBox}" TextWrapping="Wrap" Margin="5,5,5,35" TextChanged="pathFileTextBox_TextChanged" Height="20" Width="328"/>
+            <Button x:Name="pathToFileBtn" Content="Файл" FontSize="11" Style="{StaticResource StyledButton}" Click="PathToFileBtn_Click" Margin="10,5,5,5" Height="25" Width="64" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" />
+            <TextBox x:Name="pathFileTextBox" Style="{StaticResource StyledTextBox}" TextWrapping="Wrap" Margin="5,5,5,5" TextChanged="pathFileTextBox_TextChanged" Height="20" Width="300"/>
         </StackPanel>
 
         <!-- Кнопка sortedUIDs перемещается на вторую строку -->
-        <Button x:Name="sortedUIDs" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" FontSize="11" Content="Сортировать UIDы" Style="{StaticResource StyledButton}"  Margin="5,40,5,5" Height="25" Width="110" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" Click="sortedUIDs_Click" />
+        <Button x:Name="sortedUIDs" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" FontSize="11" Content="Сортировать UIDы" Style="{StaticResource StyledButton}"  Margin="5,5,5,5" Height="25" Width="110" HorizontalAlignment="Left" RenderTransformOrigin="1.817,0.568" Click="sortedUIDs_Click" />
 
         <!-- Лейбл "Путь к папке с csv файлами" -->
         <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Выбрать .csv файлы для добавления в итоговый файл" Margin="10,0,0,0" FontSize="12"/>
