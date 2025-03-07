@@ -150,9 +150,15 @@
 
         <StackPanel Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="5,5,5,10"/>
 
+        <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="10,5,5,5">
+            <RadioButton x:Name="RadioButtonSO" Content="SO" IsChecked="True" FontSize="10" Margin="5,5,5,5" Checked="RadioButtonSO_Checked" />
+            <RadioButton x:Name="RadioButtonSK" Content="SK" FontSize="10" Margin="5,5,5,5" Checked="RadioButtonSK_Checked" />
+        </StackPanel>
+
         <!-- Остальные элементы -->
         <CheckBox x:Name="CheckBoxMeasurements" Grid.Column="0" Grid.Row="4" Content="В файле есть замеры" Checked="CheckBox_Unchecked" Margin="10,5,5,5" Unchecked="CheckBox_Checked" FontSize="10" VerticalAlignment="Bottom" />
         <CheckBox x:Name="CheckBoxSmartNTFile" Grid.Column="1" Grid.Row="4" Content="SmartNTFile" Checked="CheckBox_Unchecked" FontSize="10" Margin="5,5,5,5" />
+        
 
         <Label x:Name="numberOfColumnLabel" Grid.Column="0" Grid.Row="5" Content="Номер столбца с UID:" Margin="10,5,5,5" FontSize="10"/>
         <TextBox x:Name="numberOfColumnTextBox" Grid.Column="1" Grid.Row="5" Style="{StaticResource StyledTextBox}" Margin="5,5,5,5" Width="77" HorizontalAlignment="Left" TextChanged="numberOfColumnTextBox_TextChanged_1" Text="1" />

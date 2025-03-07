@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Linq;
 using MessageBox = System.Windows.MessageBox;
+using System.Text;
 
 namespace CSVParser
 {
@@ -63,8 +64,33 @@ namespace CSVParser
         private void sortedUIDs_Click(object sender, RoutedEventArgs e)
         {
             string path = pathFileTextBox.Text;
+            if (IsFileOpen(path))
+            {
+                // Уведомление пользователя
+                MessageBox.Show("Файл уже открыт. Закройте файл перед выполнением операции.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Прерываем выполнение метода
+            }
+
             ViewAllRowsInFileToSorting();
             CheckBoxMeasurements.IsChecked = true;
+        }
+
+        private bool IsFileOpen(string filePath)
+        {
+            try
+            {
+                // Пытаемся открыть файл для записи с исключительным доступом
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    // Если файл не открыт, возвращаем false
+                    return false;
+                }
+            }
+            catch (IOException)
+            {
+                // Если файл открыт, будет выброшено исключение
+                return true;
+            }
         }
 
         public void PathBtn_Click(object sender, RoutedEventArgs e)
@@ -107,6 +133,7 @@ namespace CSVParser
 
             // Обработка файлов через StringProcessing
             _workingWithFiles.ProcessFiles(selectedFiles);
+            selectedFiles = null;
         }
 
 
@@ -124,6 +151,7 @@ namespace CSVParser
 
                 // Открыть папку с файлом
                 OpenFolderWithFile(Path.GetDirectoryName(Path.GetFullPath(filePath)));
+                ResetApplicationState();
             }
 
             
@@ -467,6 +495,8 @@ namespace CSVParser
                                                                               // Имя папки
             string folderName = $"CSVParser_Results_{dateTimeString}";
 
+            int numberOfValues = Convert.ToInt16(numberOfValuesTextBox.Text);
+
             // Путь к папке (например, на рабочем столе)
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string folderPath = Path.Combine(desktopPath, folderName);
@@ -480,10 +510,9 @@ namespace CSVParser
 
             int counterRows = 0; // Счетчик строк для отображения
             int columnWithUIDs = 1; // Столбец 2 (индекс 1) - UIDы
-            int columnWithText = 2; // Столбец 3 (индекс 2) - текст
+            int columnWithText = 3; // Столбец 3 (индекс 2) - текст
             var random = new Random();
-
-            using (var writer = new StreamWriter(fullPath)) // Используем полный путь к файлу
+            using (var writer = new StreamWriter(fullPath, false, Encoding.UTF8)) // Используем полный путь к файлу
             {
                 using (var reader = new StreamReader(path))
                 {
@@ -497,59 +526,371 @@ namespace CSVParser
                         {
                             string uid = values[columnWithUIDs]; // Получаем UID
                             string text = values[columnWithText]; // Получаем текст
+                            string text1 = values[columnWithText];
 
-                            // Проверяем, что текст соответствует одному из требований и записываем 4 случайных значения
-                            for (int i = 0; i < 4; i++)
+                            // Проверяем, какой чек-бокс активен
+                            bool isSOChecked = RadioButtonSO.IsChecked == true; // Предположим, что это имя вашего чек-бокса для СО
+                            bool isSKChecked = RadioButtonSK.IsChecked == true; // Предположим, что это имя вашего чек-бокса для СК
+
+                            for (int i = 0; i < numberOfValues; i++)
                             {
                                 double value = 0.0;
 
-                                // Определяем, какое значение записывать на основе текста
+                                // Проверяем активный чек-бокс
+                                if (isSOChecked)
+                                {
+                                    // Условия для РДУ и ЦДУ
+                                    if (text.Contains("Частота"))
+                                        value = random.NextDouble() * 0.01 + 49.9; // пример для частоты
+                                    else if (text.Contains("Температура"))
+                                        value = random.NextDouble() * 0.01 + 23.9; // пример для частоты
+                                    else if (text.Contains(" 6кВ U"))
+                                        value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+                                    else if (text.Contains(" 10кВ U"))
+                                        value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+                                    else if (text.Contains(" 35кВ U"))
+                                        value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+                                    else if (text.Contains(" 110кВ U"))
+                                        value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+                                    else if (text.Contains(" 220кВ U"))
+                                        value = random.NextDouble() * (222 - 218) + 218; // 220кВ +- 5%
+                                    else if (text.Contains(" 220кВ U"))
+                                        value = random.NextDouble() * (332 - 318) + 318; // 330кВ +- 5%
+                                    else if (text.Contains(" 500кВ U"))
+                                        value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
 
-                                // Частота
-                                if (text.Contains("Частота"))
-                                    value = random.NextDouble() * 0.01 + 49.9; // 6кВ +- 5%
+                                    // Ток 
+                                    else if (text.Contains(" 6кВ I"))
+                                        value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+                                    else if (text.Contains(" 10кВ I"))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+                                    else if (text.Contains(" 35кВ I"))
+                                        value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+                                    else if (text.Contains(" 110кВ I"))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+                                    else if (text.Contains(" 220кВ I"))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+                                    else if (text.Contains(" 330кВ I"))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+                                    else if (text.Contains(" 500кВ I"))
+                                        value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
 
-                                // Напряжение
-                                else if (text.Contains(" 6кВ U"))
-                                    value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
-                                else if (text.Contains(" 10кВ U"))
-                                    value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
-                                else if (text.Contains(" 35кВ U"))
-                                    value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
-                                else if (text.Contains(" 110кВ U"))
-                                    value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
-                                else if (text.Contains(" 220кВ U"))
-                                    value = random.NextDouble() * (218 - 222) + 108; // 110кВ +- 5%
-                                else if (text.Contains(" 500кВ U"))
-                                    value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
 
-                                // Ток
-                                else if (text.Contains(" 6кВ I"))
-                                    value = random.NextDouble() * (205 - 195) + 195; // 500кВ +- 5%
-                                else if (text.Contains(" 10кВ I"))
-                                    value = random.NextDouble() * (105 - 95) + 95; // 500кВ +- 5%
-                                else if (text.Contains(" 35кВ I"))
-                                    value = random.NextDouble() * (85 - 75) + 75; // 500кВ +- 5%
-                                else if (text.Contains(" 110кВ I"))
-                                    value = random.NextDouble() * (105 - 95) + 95; // 500кВ +- 5%
-                                else if (text.Contains(" 500кВ I"))
-                                    value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
-                                else
-                                    continue; // Пропускаем строки, которые не соответствуют
-                                              // Записываем UID и случайное значение
-                                writer.WriteLine($"{uid};{Math.Round(value, 2)}");
+                                    // ЦДУ
+                                    // Напряжение
+                                    else if (text.Contains("Факт U ") | text.Contains(" 6 кВ "))
+                                        value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 10 кВ "))
+                                        value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 35 кВ "))
+                                        value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 110 кВ "))
+                                        value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 220 кВ "))
+                                        value = random.NextDouble() * (218 - 222) + 108; // 220кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 330 кВ "))
+                                        value = random.NextDouble() * (332 - 328) + 328; // 330кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 500 кВ "))
+                                        value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
+
+                                    // Ток 
+                                    else if (text.Contains("Факт I ") | text.Contains(" 6 кВ "))
+                                        value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 10 кВ "))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 35 кВ "))
+                                        value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 110 кВ "))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 220 кВ "))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 330 кВ "))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+                                    else if (text.Contains("Факт I ") | text.Contains(" 500 кВ "))
+                                        value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
+                                    else
+                                        continue; // Пропускаем строки, которые не соответствуют
+
+                                }
+                                else if (isSKChecked)
+                                {
+                                    // Условия для ZES
+                                    if (text.Contains("Частота"))
+                                        value = random.NextDouble() * 0.01 + 49.9; // пример для частоты
+                                    else if (text.Contains("Температура"))
+                                        value = random.NextDouble() * 0.01 + 23.9; // пример для частоты
+                                    else if (text.Contains("Факт U ") | text.Contains(" 6 кВ "))
+                                        value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 10 кВ "))
+                                        value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 35 кВ "))
+                                        value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 110 кВ "))
+                                        value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 220 кВ "))
+                                        value = random.NextDouble() * (218 - 222) + 108; // 220кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 330 кВ "))
+                                        value = random.NextDouble() * (332 - 328) + 328; // 330кВ +- 5%
+                                    else if (text.Contains("Факт U ") | text.Contains(" 500 кВ "))
+                                        value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
+
+                                    // Ток 
+                                    else if (text.Contains(" 6 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+                                    else if (text.Contains(" 10 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+                                    else if (text.Contains(" 35 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+                                    else if (text.Contains(" 110 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+                                    else if (text.Contains(" 220 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+                                    else if (text.Contains(" 330 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+                                    else if (text.Contains(" 500 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+                                        value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
+                                    else
+                                        continue; // Пропускаем строки, которые не соответствуют
+
+                                }
+
+                                // Записываем UID и случайное значение, если значение было присвоено
+                                if (value != 0.0)
+                                {
+                                    writer.WriteLine($"{uid};{Math.Round(value, 2)}; {text1}");
+                                }
+
+                                counterRows++; // Увеличиваем счетчик строк
                             }
-
-                            counterRows++; // Увеличиваем счетчик строк
                         }
                     }
                 }
-            }
 
-            // Сохраняем путь к созданному файлу в переменную
-            createdFilePath = fullPath;
-            //processedRowsLabelValue.Content = counterRows; // Отображаем количество обработанных строк
-            MessageBox.Show($"Файл успешно создан: {fullPath}", "Готово", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Сохраняем путь к созданному файлу в переменную
+                createdFilePath = fullPath;
+                MessageBox.Show($"Файл успешно создан: {fullPath}", "Готово", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        //    using (var writer = new StreamWriter(fullPath, false, Encoding.UTF8)) // Используем полный путь к файлу
+        //    {
+        //        using (var reader = new StreamReader(path))
+        //        {
+        //            while (!reader.EndOfStream)
+        //            {
+        //                string line = reader.ReadLine(); // Прочитать текущую линию
+        //                string[] values = line.Split(';'); // Разделить строку на массив значений
+
+        //                // Проверка на корректность количества столбцов
+        //                if (values.Length > columnWithText)
+        //                {
+        //                    string uid = values[columnWithUIDs]; // Получаем UID
+        //                    string text = values[columnWithText]; // Получаем текст
+        //                    string text1 = values[columnWithText];
+
+        //                    // Проверяем, что текст соответствует одному из требований и записываем 4 случайных значения
+        //                    for (int i = 0; i < numberOfValues; i++)
+        //                    {
+
+        //                        //for (int i = 0; i < 4; i++)
+        //                        //{
+        //                        //    double value = 0.0;
+        //                        //    bool valueAssigned = false;
+
+        //                        //    // Общие
+        //                        //    if (text.Contains("Частота"))
+        //                        //    {
+        //                        //        value = random.NextDouble() * 0.01 + 49.9; // 6кВ +- 5%
+        //                        //        valueAssigned = true;
+        //                        //    }
+        //                        //    else
+        //                        //    {
+        //                        //        // Определяем напряжение или ток
+        //                        //        bool isVoltage = text.Contains(" U ");
+        //                        //        bool isCurrent = text.Contains(" I ");
+
+        //                        //        if (isVoltage || isCurrent)
+        //                        //        {
+        //                        //            if (text.Contains(" 6кВ ") || text.Contains(" 6 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * 0.1 + 5.95 : random.NextDouble() * (205 - 195) + 195;
+        //                        //            else if (text.Contains(" 10кВ ") || text.Contains(" 10 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * 0.1 + 9.95 : random.NextDouble() * (105 - 95) + 95;
+        //                        //            else if (text.Contains(" 35кВ ") || text.Contains(" 35 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * (36 - 34) + 34 : random.NextDouble() * (85 - 75) + 75;
+        //                        //            else if (text.Contains(" 110кВ ") || text.Contains(" 110 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * (111 - 108) + 108 : random.NextDouble() * (105 - 95) + 95;
+        //                        //            else if (text.Contains(" 220кВ ") || text.Contains(" 220 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * (222 - 218) + 218 : random.NextDouble() * (105 - 95) + 95;
+        //                        //            else if (text.Contains(" 330кВ ") || text.Contains(" 330 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * (332 - 328) + 328 : random.NextDouble() * (105 - 95) + 95;
+        //                        //            else if (text.Contains(" 500кВ ") || text.Contains(" 500 кВ "))
+        //                        //                value = isVoltage ? random.NextDouble() * (502 - 498) + 498 : random.NextDouble() * (505 - 495) + 495;
+
+        //                        //            valueAssigned = true;
+        //                        //        }
+        //                        //    }
+
+        //                        //    // Если значение было присвоено, записываем его
+        //                        //    if (valueAssigned)
+        //                        //    {
+        //                        //        writer.WriteLine($"{uid};{Math.Round(value, 2)}");
+        //                        //    }
+
+        //                        //    counterRows++; // Увеличиваем счетчик строк
+        //                        //}
+        //                        double value = 0.0;
+
+
+        //                        // Определяем, какое значение записывать на основе текста
+
+        //                        // Общие
+        //                        // Частота
+        //                        if (text.Contains("Частота"))
+        //                            value = random.NextDouble() * 0.01 + 49.9; // 6кВ +- 5%
+        //                        // РДУ
+        //                        // Напряжение
+        //                        else if (text.Contains(" 6кВ U"))
+        //                            value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+        //                        else if (text.Contains(" 10кВ U"))
+        //                            value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+        //                        else if (text.Contains(" 35кВ U"))
+        //                            value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+        //                        else if (text.Contains(" 110кВ U"))
+        //                            value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+        //                        else if (text.Contains(" 220кВ U"))
+        //                            value = random.NextDouble() * (222 - 218) + 218; // 220кВ +- 5%
+        //                        else if (text.Contains(" 220кВ U"))
+        //                            value = random.NextDouble() * (332 - 318) + 318; // 330кВ +- 5%
+        //                        else if (text.Contains(" 500кВ U"))
+        //                            value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
+
+        //                        // Ток 
+        //                        else if (text.Contains(" 6кВ I"))
+        //                            value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+        //                        else if (text.Contains(" 10кВ I"))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+        //                        else if (text.Contains(" 35кВ I"))
+        //                            value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+        //                        else if (text.Contains(" 110кВ I"))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+        //                        else if (text.Contains(" 220кВ I"))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+        //                        else if (text.Contains(" 330кВ I"))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+        //                        else if (text.Contains(" 500кВ I"))
+        //                            value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
+
+        //                        // ЦДУ
+        //                        // Напряжение
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 6 кВ "))
+        //                            value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 10 кВ "))
+        //                            value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 35 кВ "))
+        //                            value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 110 кВ "))
+        //                            value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 220 кВ "))
+        //                            value = random.NextDouble() * (218 - 222) + 108; // 220кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 330 кВ "))
+        //                            value = random.NextDouble() * (332 - 328) + 328; // 330кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 500 кВ "))
+        //                            value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
+
+        //                        // Ток 
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 6 кВ "))
+        //                            value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 10 кВ "))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 35 кВ "))
+        //                            value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 110 кВ "))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 220 кВ "))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 330 кВ "))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+        //                        else if (text.Contains("Факт I ") | text.Contains(" 500 кВ "))
+        //                            value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
+
+        //                        // ZES
+        //                        // Напряжение
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 6 кВ "))
+        //                            value = random.NextDouble() * 0.1 + 5.95; // 6кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 10 кВ "))
+        //                            value = random.NextDouble() * 0.1 + 9.95; // 10кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 35 кВ "))
+        //                            value = random.NextDouble() * (36 - 34) + 34; // 35кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 110 кВ "))
+        //                            value = random.NextDouble() * (111 - 108) + 108; // 110кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 220 кВ "))
+        //                            value = random.NextDouble() * (218 - 222) + 108; // 220кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 330 кВ "))
+        //                            value = random.NextDouble() * (332 - 328) + 328; // 330кВ +- 5%
+        //                        else if (text.Contains("Факт U ") | text.Contains(" 500 кВ "))
+        //                            value = random.NextDouble() * (502 - 498) + 498; // 500кВ +- 5%
+
+        //                        // Ток 
+        //                        else if (text.Contains(" 6 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (205 - 195) + 195; // 6кВ +- 5%
+        //                        else if (text.Contains(" 10 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 10кВ +- 5%
+        //                        else if (text.Contains(" 35 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (85 - 75) + 75; // 35кВ +- 5%
+        //                        else if (text.Contains(" 110 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 110кВ +- 5%
+        //                        else if (text.Contains(" 220 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 220кВ +- 5%
+        //                        else if (text.Contains(" 330 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (105 - 95) + 95; // 330кВ +- 5%
+        //                        else if (text.Contains(" 500 кВ ") && (text.Contains("Ia ") || text.Contains("Ib ") || text.Contains("Ic ")))
+        //                            value = random.NextDouble() * (505 - 495) + 495; // 500кВ +- 5%
+
+        //                        else
+        //                            continue; // Пропускаем строки, которые не соответствуют
+        //                                      // Записываем UID и случайное значение
+        //                        writer.WriteLine($"{uid};{Math.Round(value, 2)}; {text1}");
+        //                    }
+
+        //                    counterRows++; // Увеличиваем счетчик строк
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    // Сохраняем путь к созданному файлу в переменную
+        //    createdFilePath = fullPath;
+        //    //processedRowsLabelValue.Content = counterRows; // Отображаем количество обработанных строк
+        //    MessageBox.Show($"Файл успешно создан: {fullPath}", "Готово", MessageBoxButton.OK, MessageBoxImage.Information);
+        //}
+
+
+        public void ResetApplicationState()
+        {
+            // Очистка списков
+            pathFilesList.Clear();
+            uidsList.Clear();
+            measurementsList.Clear();
+            uids.Clear();
+
+            // Сброс счетчиков
+            counterFiles = 0;
+            counterRows = 0;
+
+            // Очистка текстовых полей
+            pathFileTextBox.Text = string.Empty;
+            
+            // Очистка меток
+            processedFilesLabelValue.Content = "0";
+            processedRowsLabelValue.Content = "0";
+            writeToFileUIDsLabelValue.Content = "0";
+
+            // Сброс флажков
+            CheckBoxMeasurements.IsChecked = false;
+            CheckBoxSmartNTFile.IsChecked = false;
+
+            // Очистка других элементов управления, если необходимо
+            // Например, если у вас есть другие текстовые поля или метки, их тоже нужно очистить
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -577,6 +918,16 @@ namespace CSVParser
         }
 
         private void pathTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void RadioButtonSO_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RadioButtonSK_Checked(object sender, RoutedEventArgs e)
         {
 
         }
